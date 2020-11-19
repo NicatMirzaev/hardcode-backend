@@ -1,5 +1,6 @@
-var resolvers = {
-    message: () => 'Hello World!'
+module.exports = db => {
+  const resolvers = {
+    message: () => db
+  }
+  return resolvers;
 };
-
-module.exports = resolvers;

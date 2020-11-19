@@ -1,8 +1,8 @@
 const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema.js');
-const resolvers = require('./resolvers.js');
-
+const db = require('./db.js');
+const resolvers = require('./resolvers.js')(db);
 
 // Create an express server and a GraphQL endpoint
 const app = express();
