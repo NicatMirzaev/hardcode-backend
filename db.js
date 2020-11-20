@@ -5,7 +5,7 @@ const sequelize = new Sequelize('hardcode', 'root', '', {
   dialect: 'mysql'
 });
 
-require('./models.js')(sequelize, DataTypes);
+require('./models.js')(sequelize, Sequelize, DataTypes);
 
 async function syncDatabase(){
   await sequelize.sync({ alter: true });
