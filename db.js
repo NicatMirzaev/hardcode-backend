@@ -1,7 +1,9 @@
 const { Sequelize, DataTypes} = require('sequelize');
+const settings = require('./settings.js');
 
-const sequelize = new Sequelize('hardcode', 'root', '', {
-  host: 'localhost',
+
+const sequelize = new Sequelize(settings.db_name, settings.db_username, settings.db_password, {
+  host: settings.db_host,
   dialect: 'mysql'
 });
 

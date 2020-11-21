@@ -9,9 +9,11 @@
   "author": "NicatMirzoev",
   "license": "ISC",
   "dependencies": {
+    "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-graphql": "^0.11.0",
     "graphql": "^15.4.0",
+    "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.6",
     "sequelize": "^6.3.5"
