@@ -6,6 +6,7 @@ const schema = buildSchema(`
         username: String!
         password: String!
         email: String!
+        isConfirmed: Boolean!
     }
     type AuthPayload {
       token: String!
@@ -18,6 +19,7 @@ const schema = buildSchema(`
     type Mutation {
       registerUser(username: String!, password: String!, email: String!): AuthPayload!
       loginUser(email: String!, password: String!): AuthPayload!
+      confirmUser(token: String!): User
     }
 `);
 

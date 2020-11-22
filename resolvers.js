@@ -1,7 +1,10 @@
 const jsonwebtoken = require('jsonwebtoken')
 const Op = require('Sequelize').Op;
-const { secret } = require('./settings.js');
+const settings = require('./lib/settings.js');
 const emailValidator = require('email-validator');
+const transporter = require('./lib/mail.js');
+const handlebars = require('handlebars');
+const fs = require('fs');
 
 module.exports = db => {
   return {
@@ -16,7 +19,7 @@ module.exports = db => {
       try {
         const checkEmail = emailValidator.validate(email);
         if(!checkEmail) throw new Error("Geçersiz e-mail adresi girdiniz.");
-        
+
         const isAvailable = await db.models.Users.findOne({where: {[Op.or]: [{username: username}, {email: email}]}})
         if(isAvailable){
           if(isAvailable.username === username) throw new Error("Bu kullanıcı adı kullanılmaktadır.")
@@ -28,10 +31,35 @@ module.exports = db => {
           password: password
         })
         const token = jsonwebtoken.sign(
-          { id: user.id, email: user.email},
-          secret,
+          { id: user.id },
+          settings.authSecret,
           { expiresIn: '1y' }
         )
+        const confirmationToken = jsonwebtoken.sign(
+          { id: user.id },
+          settings.confirmSecret,
+          { expiresIn: '1d' }
+        )
+        fs.readFile('./templates/confirmationTemplate.html', {encoding: 'utf-8'}, function (err, html){
+          if(err){
+            console.log(err);
+          }
+          else{
+            const template = handlebars.compile(html);
+            const replacements = {
+              link: 'https://localhost:3000/confirm/' + confirmationToken
+            }
+            const htmlToSend = template(replacements);
+            const mailOptions = {
+              from: 'nicatmirzoev111@gmail.com',
+              to: email,
+              subject: 'HardCode - Hesap Onaylama',
+              html: htmlToSend,
+            }
+            transporter.sendMail(mailOptions);
+          }
+        })
+
         return {
           token, user: {id: user.id, username: user.username, email: user.email}
         }
@@ -45,8 +73,8 @@ module.exports = db => {
         const user = await db.models.Users.findOne({where: {email: email, password: password}});
         if(!user) throw new Error("Geçersiz email adresi veya şifre.");
         const token = jsonwebtoken.sign(
-          { id: user.id, email: user.email},
-          secret,
+          { id: user.id },
+          settings.authSecret,
           { expiresIn: '1d'}
         )
         return {
@@ -55,6 +83,20 @@ module.exports = db => {
       }
       catch (error) {
         throw new Error(error.message)
+      }
+    },
+    confirmUser: async ({ token }) => {
+      try {
+        if(!token) throw new Error("Geçersiz token.");
+        const verifiedToken = jsonwebtoken.verify(token, settings.confirmSecret);
+        const user = await db.models.Users.findByPk(verifiedToken.id);
+        if(!user) throw new Error("Geçersiz token.");
+        user.isConfirmed = true;
+        await user.save();
+        return user
+      }
+      catch (error) {
+        throw new Error(error.message);
       }
     }
   }

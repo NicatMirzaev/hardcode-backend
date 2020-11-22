@@ -1,11 +1,11 @@
 const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema.js');
-const db = require('./db.js');
+const db = require('./lib/db.js');
 const resolvers = require('./resolvers.js')(db);
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
-const { secret } = require('./settings.js');
+const { authSecret } = require('./lib/settings.js');
 
 // Create an express server and a GraphQL endpoint
 const app = express();
@@ -18,7 +18,7 @@ const authMiddleware = (req, res, next) => {
       req.user = null;
     }
     else {
-      req.user = jwt.verify(token, secret);
+      req.user = jwt.verify(token, authSecret);
     }
     next();
   }
