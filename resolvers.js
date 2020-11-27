@@ -168,7 +168,6 @@ module.exports = db => {
         const verifiedToken = (!type ? jsonwebtoken.verify(token, settings.authSecret) : jsonwebtoken.verify(token, settings.resetPasswordConfirmSecret));
         const user = await db.models.Users.findByPk(verifiedToken.id);
         if(!user) throw new Error("Kullanıcı bulunamadı.");
-        console.log(user);
         user.password = newPassword;
         await user.save();
         return true;
