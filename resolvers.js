@@ -17,6 +17,9 @@ module.exports = db => {
     },
     registerUser: async ({ username, email, password }) => {
       try {
+        if(username.length < 3 || username.length > 40) throw new Error("Kullanıcı adı en az 3, en fazla 40 karakterden oluşabilir.");
+        if(password.length < 6 || password.length > 255) throw new Error("Şifre en az 6, en fazla 255 karakterden oluşabilir.");
+
         const checkEmail = emailValidator.validate(email);
         if(!checkEmail) throw new Error("Geçersiz e-mail adresi girdiniz.");
 
@@ -47,7 +50,7 @@ module.exports = db => {
           else{
             const template = handlebars.compile(html);
             const replacements = {
-              link: 'https://localhost:3000/confirm/' + confirmationToken
+              link: 'http://localhost:3000/confirm/' + confirmationToken
             }
             const htmlToSend = template(replacements);
             const mailOptions = {
@@ -70,8 +73,35 @@ module.exports = db => {
     },
     loginUser: async ({ email, password }) => {
       try {
+        if(email.length < 3 || password.length < 3) throw new Error("Lütfen mail ve şifrenizi eksiksiz doldurun.");
         const user = await db.models.Users.findOne({where: {email: email, password: password}});
         if(!user) throw new Error("Geçersiz email adresi veya şifre.");
+        if(user.isConfirmed == false) {
+          const confirmationToken = jsonwebtoken.sign(
+            { id: user.id },
+            settings.confirmSecret,
+            { expiresIn: '1d' }
+          )
+          fs.readFile('./templates/confirmationTemplate.html', {encoding: 'utf-8'}, function (err, html) {
+            if(err) {
+              console.log(err);
+            }
+            else {
+              const template = handlebars.compile(html);
+              const replacements = {
+                link: 'http://localhost:3000/confirm/' + confirmationToken
+              }
+              const htmlToSend = template(replacements);
+              const mailOptions = {
+                from: 'nicatmirzoev111@gmail.com',
+                to: email,
+                subject: 'HardCode - Hesap Onaylama',
+                html: htmlToSend,
+              }
+              transporter.sendMail(mailOptions);
+            }
+          })
+        }
         const token = jsonwebtoken.sign(
           { id: user.id },
           settings.authSecret,

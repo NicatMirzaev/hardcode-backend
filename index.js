@@ -5,6 +5,7 @@ const db = require('./lib/db.js');
 const resolvers = require('./resolvers.js')(db);
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const { authSecret } = require('./lib/settings.js');
 
 // Create an express server and a GraphQL endpoint
@@ -29,6 +30,7 @@ const authMiddleware = (req, res, next) => {
 }
 app.use(bodyParser.json())
 app.use(authMiddleware);
+app.use(cors());
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: resolvers,
