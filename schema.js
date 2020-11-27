@@ -4,7 +4,6 @@ const schema = buildSchema(`
     type User {
         id: String!
         username: String!
-        password: String!
         email: String!
         isConfirmed: Boolean!
     }
@@ -20,6 +19,8 @@ const schema = buildSchema(`
       registerUser(username: String!, password: String!, email: String!): AuthPayload!
       loginUser(email: String!, password: String!): AuthPayload!
       confirmUser(token: String!): User
+      sendResetPasswordConfirmation(email: String!): Boolean!
+      resetPassword(token: String!, newPassword: String!, type: Int!): Boolean!
     }
 `);
 

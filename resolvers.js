@@ -40,10 +40,10 @@ module.exports = db => {
         )
         const confirmationToken = jsonwebtoken.sign(
           { id: user.id },
-          settings.confirmSecret,
+          settings.signupConfirmSecret,
           { expiresIn: '1d' }
         )
-        fs.readFile('./templates/confirmationTemplate.html', {encoding: 'utf-8'}, function (err, html){
+        fs.readFile('./templates/signup-confirmation-template.html', {encoding: 'utf-8'}, function (err, html){
           if(err){
             console.log(err);
           }
@@ -54,7 +54,7 @@ module.exports = db => {
             }
             const htmlToSend = template(replacements);
             const mailOptions = {
-              from: 'nicatmirzoev111@gmail.com',
+              from: 'HardCode Community',
               to: email,
               subject: 'HardCode - Hesap Onaylama',
               html: htmlToSend,
@@ -79,10 +79,10 @@ module.exports = db => {
         if(user.isConfirmed == false) {
           const confirmationToken = jsonwebtoken.sign(
             { id: user.id },
-            settings.confirmSecret,
+            settings.signupConfirmSecret,
             { expiresIn: '1d' }
           )
-          fs.readFile('./templates/confirmationTemplate.html', {encoding: 'utf-8'}, function (err, html) {
+          fs.readFile('./templates/signup-confirmation-template.html', {encoding: 'utf-8'}, function (err, html) {
             if(err) {
               console.log(err);
             }
@@ -93,7 +93,7 @@ module.exports = db => {
               }
               const htmlToSend = template(replacements);
               const mailOptions = {
-                from: 'nicatmirzoev111@gmail.com',
+                from: 'HardCode Community',
                 to: email,
                 subject: 'HardCode - Hesap Onaylama',
                 html: htmlToSend,
@@ -118,12 +118,60 @@ module.exports = db => {
     confirmUser: async ({ token }) => {
       try {
         if(!token) throw new Error("Geçersiz token.");
-        const verifiedToken = jsonwebtoken.verify(token, settings.confirmSecret);
+        const verifiedToken = jsonwebtoken.verify(token, settings.signupConfirmSecret);
         const user = await db.models.Users.findByPk(verifiedToken.id);
-        if(!user) throw new Error("Geçersiz token.");
+        if(!user) throw new Error("Kullanıcı bulunamadı.");
         user.isConfirmed = true;
         await user.save();
         return user
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    sendResetPasswordConfirmation: async ({ email }) => {
+      try {
+        const user = await db.models.Users.findOne({where: {email: email}});
+        if(!user) throw new Error("Geçersiz email adresi girdiniz.");
+        const token = jsonwebtoken.sign(
+          { id: user.id },
+          settings.resetPasswordConfirmSecret,
+          { expiresIn: 1800000 }
+        )
+        fs.readFile('./templates/reset-password-confirmation-template.html', {encoding: 'utf-8'}, function (err, html) {
+          if(err) {
+            console.log(err);
+          }
+          else {
+            const template = handlebars.compile(html);
+            const replacements = {
+              link: 'http://localhost:3000/reset-password/' + token
+            }
+            const htmlToSend = template(replacements);
+            const mailOptions = {
+              from: 'HardCode Community',
+              to: email,
+              subject: 'HardCode - Şifre Değiştirme',
+              html: htmlToSend,
+            }
+            transporter.sendMail(mailOptions);
+          }
+        })
+        return true;
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    resetPassword: async ({ token, newPassword, type }) => {
+      try {
+        const verifiedToken = (!type ? jsonwebtoken.verify(token, settings.authSecret) : jsonwebtoken.verify(token, settings.resetPasswordConfirmSecret));
+        const user = await db.models.Users.findByPk(verifiedToken.id);
+        if(!user) throw new Error("Kullanıcı bulunamadı.");
+        console.log(user);
+        user.password = newPassword;
+        await user.save();
+        return true;
       }
       catch (error) {
         throw new Error(error.message);
