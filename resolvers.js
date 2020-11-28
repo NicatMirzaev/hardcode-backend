@@ -165,6 +165,7 @@ module.exports = db => {
     },
     resetPassword: async ({ token, newPassword, type }) => {
       try {
+        if(newPassword.length < 6 || newPassword.length > 255) throw new Error("Şifre en az 6, en fazla 255 karakterden oluşabilir.");
         const verifiedToken = (!type ? jsonwebtoken.verify(token, settings.authSecret) : jsonwebtoken.verify(token, settings.resetPasswordConfirmSecret));
         const user = await db.models.Users.findByPk(verifiedToken.id);
         if(!user) throw new Error("Kullanıcı bulunamadı.");
