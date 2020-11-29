@@ -24,4 +24,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         defaultValue: false
       }
   })
+  sequelize.define('Subscribers', {
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  })
 }

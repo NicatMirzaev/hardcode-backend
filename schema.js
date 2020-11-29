@@ -21,6 +21,8 @@ const schema = buildSchema(`
       confirmUser(token: String!): User
       sendResetPasswordConfirmation(email: String!): Boolean!
       resetPassword(token: String!, newPassword: String!, type: Int!): Boolean!
+      subscribeEmail(email: String!): Boolean!
+      unsubscribeEmail(email: String!): Boolean!
     }
 `);
 

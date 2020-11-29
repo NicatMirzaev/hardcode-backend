@@ -176,6 +176,29 @@ module.exports = db => {
       catch (error) {
         throw new Error(error.message);
       }
+    },
+    subscribeEmail: async ({ email }) => {
+      try {
+        if(!emailValidator.validate(email)) throw new Error("Geçersiz e-mail adresi girdiniz.");
+        const check = await db.models.Subscribers.findOne({where: {email: email}});
+        if(check) throw new Error("Bu e-mail adresi ile zaten abone olunmuş.");
+        await db.models.Subscribers.create({email: email});
+        return true;
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    unsubscribeEmail: async ({ email }) => {
+      try {
+        const check = db.models.Subscribers.findOne({where: {email: email}})
+        if(!check) throw new Error("Geçersiz e-mail adresi.");
+        await check.destroy();
+        return true;
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
     }
   }
 }
