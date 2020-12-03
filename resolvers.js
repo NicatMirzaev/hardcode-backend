@@ -80,7 +80,7 @@ module.exports = db => {
           const confirmationToken = jsonwebtoken.sign(
             { id: user.id },
             settings.signupConfirmSecret,
-            { expiresIn: '1d' }
+            { expiresIn: '1y' }
           )
           fs.readFile('./templates/signup-confirmation-template.html', {encoding: 'utf-8'}, function (err, html) {
             if(err) {
