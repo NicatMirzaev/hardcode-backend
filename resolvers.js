@@ -13,7 +13,7 @@ module.exports = db => {
     },
     me: async (args, req) => {
       if(!req.user) throw new Error("Giriş yapmalısınız.");
-      return await db.models.Users.findByPk(req.user.id);
+      return await db.models.Users.findByPk(req.user.id)
     },
     registerUser: async ({ username, email, password }) => {
       try {
@@ -195,6 +195,27 @@ module.exports = db => {
         if(!check) throw new Error("Geçersiz e-mail adresi.");
         await check.destroy();
         return true;
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    updateProfile: async ({currentPassword, newPassword, LinkedinURL, GitHubURL, TwitterURL, ProfileImg, username}, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        if(!currentPassword.length) throw new Error("Hesabınızda değişiklik yapabilmek için şu anki şifrenizi girmelisiniz.");
+        if(username.length < 3 || username.length > 40) throw new Error("Kullanıcı adı en az 3, en fazla 40 karakterden oluşabilir.");
+        if(newPassword.length < 6 || newPassword.length > 255) throw new Error("Yeni şifre en az 6, en fazla 255 karakterden oluşabilir.");
+        const user = await db.models.Users.findByPk(req.user.id);
+        if(!user) throw new Error("Kullanıcı bulunamadı.")
+        if(user.password !== currentPassword) throw new Error("Mevcut şifrenizi yanlış girdiniz, lütfen tekrar deneyin.");
+        user.password = newPassword;
+        user.profileImg = ProfileImg;
+        user.twitterURL = TwitterURL;
+        user.GitHubURL = GitHubURL;
+        user.LinkedinURL = LinkedinURL;
+        await user.save();
+        return user
       }
       catch (error) {
         throw new Error(error.message);

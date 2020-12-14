@@ -6,6 +6,10 @@ const schema = buildSchema(`
         username: String!
         email: String!
         isConfirmed: Boolean!
+        profileImg: String!
+        twitterURL: String!
+        GitHubURL: String!
+        LinkedinURL: String!
     }
     type AuthPayload {
       token: String!
@@ -13,7 +17,7 @@ const schema = buildSchema(`
     }
     type Query {
       user(id: String!): User
-      me: User
+      me: User!
     }
     type Mutation {
       registerUser(username: String!, password: String!, email: String!): AuthPayload!
@@ -23,6 +27,7 @@ const schema = buildSchema(`
       resetPassword(token: String!, newPassword: String!, type: Int!): Boolean!
       subscribeEmail(email: String!): Boolean!
       unsubscribeEmail(email: String!): Boolean!
+      updateProfile(currentPassword: String!, newPassword: String!, LinkedinURL: String!, GitHubURL: String!, TwitterURL: String!, ProfileImg: String!, username: String!): User
     }
 `);
 

@@ -22,6 +22,26 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+      },
+      profileImg: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: ""
+      },
+      twitterURL: {
+        type: DataTypes.STRING(124),
+        allowNull: true,
+        defaultValue: ""
+      },
+      GitHubURL: {
+        type: DataTypes.STRING(124),
+        allowNull: true,
+        defaultValue: ""
+      },
+      LinkedinURL: {
+        type: DataTypes.STRING(124),
+        allowNull: true,
+        defaultValue: ""
       }
   })
   sequelize.define('Subscribers', {
