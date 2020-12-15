@@ -205,11 +205,12 @@ module.exports = db => {
         if(!req.user) throw new Error("Giriş yapmalısınız.");
         if(!currentPassword.length) throw new Error("Hesabınızda değişiklik yapabilmek için şu anki şifrenizi girmelisiniz.");
         if(username.length < 3 || username.length > 40) throw new Error("Kullanıcı adı en az 3, en fazla 40 karakterden oluşabilir.");
-        if(newPassword.length < 6 || newPassword.length > 255) throw new Error("Yeni şifre en az 6, en fazla 255 karakterden oluşabilir.");
+        if(newPassword.length > 0  && (newPassword.length < 6 || newPassword.length > 255)) throw new Error("Yeni şifre en az 6, en fazla 255 karakterden oluşabilir.");
         const user = await db.models.Users.findByPk(req.user.id);
         if(!user) throw new Error("Kullanıcı bulunamadı.")
         if(user.password !== currentPassword) throw new Error("Mevcut şifrenizi yanlış girdiniz, lütfen tekrar deneyin.");
-        user.password = newPassword;
+        user.username = username;
+        if(newPassword.length > 0) user.password = newPassword;
         user.profileImg = ProfileImg;
         user.twitterURL = TwitterURL;
         user.GitHubURL = GitHubURL;

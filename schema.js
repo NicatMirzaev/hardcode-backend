@@ -10,6 +10,7 @@ const schema = buildSchema(`
         twitterURL: String!
         GitHubURL: String!
         LinkedinURL: String!
+        createdAt: String!
     }
     type AuthPayload {
       token: String!
@@ -27,7 +28,7 @@ const schema = buildSchema(`
       resetPassword(token: String!, newPassword: String!, type: Int!): Boolean!
       subscribeEmail(email: String!): Boolean!
       unsubscribeEmail(email: String!): Boolean!
-      updateProfile(currentPassword: String!, newPassword: String!, LinkedinURL: String!, GitHubURL: String!, TwitterURL: String!, ProfileImg: String!, username: String!): User
+      updateProfile(currentPassword: String!, newPassword: String!, LinkedinURL: String!, GitHubURL: String!, TwitterURL: String!, ProfileImg: String!, username: String!): User!
     }
 `);
 
