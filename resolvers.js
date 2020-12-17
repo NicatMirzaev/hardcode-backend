@@ -12,8 +12,16 @@ module.exports = db => {
       return {id: id}
     },
     me: async (args, req) => {
-      if(!req.user) throw new Error("Giriş yapmalısınız.");
-      return await db.models.Users.findByPk(req.user.id)
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        const user = await db.models.Users.findByPk(req.user.id)
+        if(!user) throw new Error("Kullanıcı bulunamadı.")
+        user.requiredExp = user.level * settings.exp_to_next_level;
+        return user
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
     },
     registerUser: async ({ username, email, password }) => {
       try {
@@ -107,6 +115,7 @@ module.exports = db => {
           settings.authSecret,
           { expiresIn: '1d'}
         )
+        user.requiredExp = user.level * settings.exp_to_next_level;
         return {
           token, user
         }
@@ -216,6 +225,7 @@ module.exports = db => {
         user.GitHubURL = GitHubURL;
         user.LinkedinURL = LinkedinURL;
         await user.save();
+        user.requiredExp = user.level * settings.exp_to_next_level;
         return user
       }
       catch (error) {

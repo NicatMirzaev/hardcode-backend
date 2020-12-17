@@ -42,6 +42,16 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         type: DataTypes.STRING(124),
         allowNull: true,
         defaultValue: ""
+      },
+      level: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1
+      },
+      exp: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
       }
   })
   sequelize.define('Subscribers', {

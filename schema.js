@@ -10,6 +10,9 @@ const schema = buildSchema(`
         twitterURL: String!
         GitHubURL: String!
         LinkedinURL: String!
+        level: Int!
+        exp: Int!
+        requiredExp: Int!
         createdAt: String!
     }
     type AuthPayload {
