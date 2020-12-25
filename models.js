@@ -53,7 +53,35 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 0
       }
-  })
+  }),
+  sequelize.define('Categories', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      primaryKey: true,
+      allowNull: false
+    },
+    name: {
+      type: DataTypes.STRING(40),
+      allowNull: false,
+      defaultValue: ""
+    },
+    image: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
+      defaultValue: ""
+    },
+    views: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    }
+  }),
   sequelize.define('Subscribers', {
     email: {
       type: DataTypes.STRING,

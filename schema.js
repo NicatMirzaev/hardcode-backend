@@ -15,13 +15,20 @@ const schema = buildSchema(`
         requiredExp: Int!
         createdAt: String!
     }
+    type Category {
+      id: String!
+      name: String!
+      image: String!
+      views: Int!
+      likes: Int!
+    }
     type AuthPayload {
       token: String!
       user: User!
     }
     type Query {
-      user(id: String!): User
       me: User!
+      getCategories: [Category]
     }
     type Mutation {
       registerUser(username: String!, password: String!, email: String!): AuthPayload!

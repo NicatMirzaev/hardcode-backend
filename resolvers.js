@@ -231,6 +231,16 @@ module.exports = db => {
       catch (error) {
         throw new Error(error.message);
       }
+    },
+    getCategories: async (args, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        const categories = await db.models.Categories.findAll({order: ['likes']});
+        return categories;
+      }
+      catch (error) {
+        throw new Error(error.message);
+      }
     }
   }
 }
