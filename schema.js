@@ -12,6 +12,7 @@ const schema = buildSchema(`
         LinkedinURL: String!
         level: Int!
         exp: Int!
+        likes: [Category]
         requiredExp: Int!
         createdAt: String!
     }
@@ -21,6 +22,7 @@ const schema = buildSchema(`
       image: String!
       views: Int!
       likes: Int!
+      isLiked: Boolean!
     }
     type AuthPayload {
       token: String!
@@ -39,6 +41,7 @@ const schema = buildSchema(`
       subscribeEmail(email: String!): Boolean!
       unsubscribeEmail(email: String!): Boolean!
       updateProfile(currentPassword: String!, newPassword: String!, LinkedinURL: String!, GitHubURL: String!, TwitterURL: String!, ProfileImg: String!, username: String!): User!
+      likeCategory(categoryId: String!): Category!
     }
 `);
 

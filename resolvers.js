@@ -16,8 +16,17 @@ module.exports = db => {
         if(!req.user) throw new Error("Giriş yapmalısınız.");
         const user = await db.models.Users.findByPk(req.user.id)
         if(!user) throw new Error("Kullanıcı bulunamadı.")
+        const getLikes = await db.models.Likes.findAll({where: {userId: user.id}})
+        const likes = [];
+        for(let i = 0; i < getLikes.length; i++) {
+          const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
+          if(data) {
+            likes.push(data);
+          }
+        }
+        user.likes = likes;
         user.requiredExp = user.level * settings.exp_to_next_level;
-        return user
+        return user;
       }
       catch (error) {
         throw new Error(error.message)
@@ -115,6 +124,15 @@ module.exports = db => {
           settings.authSecret,
           { expiresIn: '1d'}
         )
+        const getLikes = await db.models.Likes.findAll({where: {userId: user.id}})
+        const likes = [];
+        for(let i = 0; i < getLikes.length; i++) {
+          const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
+          if(data) {
+            likes.push(data);
+          }
+        }
+        user.likes = likes;
         user.requiredExp = user.level * settings.exp_to_next_level;
         return {
           token, user
@@ -225,6 +243,15 @@ module.exports = db => {
         user.GitHubURL = GitHubURL;
         user.LinkedinURL = LinkedinURL;
         await user.save();
+        const getLikes = await db.models.Likes.findAll({where: {userId: user.id}})
+        const likes = [];
+        for(let i = 0; i < getLikes.length; i++) {
+          const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
+          if(data) {
+            likes.push(data);
+          }
+        }
+        user.likes = likes;
         user.requiredExp = user.level * settings.exp_to_next_level;
         return user
       }
@@ -235,11 +262,60 @@ module.exports = db => {
     getCategories: async (args, req) => {
       try {
         if(!req.user) throw new Error("Giriş yapmalısınız.");
-        const categories = await db.models.Categories.findAll({order: ['likes']});
+        const getCategories = await db.models.Categories.findAll({order: ['likes']});
+        const categories = getCategories.map(async category => {
+          const isLiked = await db.models.Likes.findOne({
+            where: {
+              [Op.and]: [
+                {userId: req.user.id},
+                {categoryId: category.id}
+              ]
+            }
+          })
+          if(isLiked) category.isLiked = true;
+          else category.isLiked = false;
+
+          return category;
+        })
         return categories;
       }
       catch (error) {
         throw new Error(error.message);
+      }
+    },
+    likeCategory: async ({ categoryId }, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        const user = await db.models.Users.findByPk(req.user.id);
+        if(!user) throw new Error("Kullanıcı bulunamadı.")
+        const category = await db.models.Categories.findByPk(categoryId);
+        if(!category) throw new Error("Kategori bulunamadı.")
+        let isLiked = false;
+        const like = await db.models.Likes.findOne({
+          where: {
+            [Op.and]: [
+              {userId: user.id},
+              {categoryId: category.id}
+            ]
+          }
+        })
+        if(like) {
+          await like.destroy();
+          category.likes -= 1;
+          await category.save();
+          isLiked = false;
+        }
+        else {
+          await db.models.Likes.create({userId: user.id, categoryId: category.id});
+          category.likes += 1;
+          await category.save();
+          isLiked = true;
+        }
+        category.isLiked = isLiked;
+        return category;
+      }
+      catch (error) {
+        throw new Error(error.message)
       }
     }
   }
