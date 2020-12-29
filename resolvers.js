@@ -21,6 +21,7 @@ module.exports = db => {
         for(let i = 0; i < getLikes.length; i++) {
           const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
           if(data) {
+            data.isLiked = true;
             likes.push(data);
           }
         }
@@ -129,6 +130,7 @@ module.exports = db => {
         for(let i = 0; i < getLikes.length; i++) {
           const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
           if(data) {
+            data.isLiked = true;
             likes.push(data);
           }
         }
@@ -248,6 +250,7 @@ module.exports = db => {
         for(let i = 0; i < getLikes.length; i++) {
           const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
           if(data) {
+            data.isLiked = true;
             likes.push(data);
           }
         }
