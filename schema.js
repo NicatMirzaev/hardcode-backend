@@ -29,6 +29,7 @@ const schema = buildSchema(`
       user: User!
     }
     type Query {
+      user(id: String!): User!
       me: User!
       getCategories: [Category]
     }

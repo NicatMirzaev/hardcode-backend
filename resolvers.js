@@ -8,8 +8,31 @@ const fs = require('fs');
 
 module.exports = db => {
   return {
-    user: ({ id }) => {
-      return {id: id}
+    user: async ({ id }, req) => {
+      if(!req.user) throw new Error("Giriş yapmalısınız.")
+      const user = await db.models.Users.findByPk(id)
+      if(!user) throw new Error("Kullanıcı bulunamadı.")
+      const getLikes = await db.models.Likes.findAll({where: {userId: user.id}})
+      const likes = [];
+      for(let i = 0; i < getLikes.length; i++) {
+        const data = await db.models.Categories.findByPk(getLikes[i].categoryId)
+        if(data) {
+          const isLiked = await db.models.Likes.findOne({
+            where: {
+              [Op.and]: [
+                {userId: req.user.id},
+                {categoryId: getLikes[i].categoryId}
+              ]
+            }
+          })
+          if(isLiked) data.isLiked = true;
+          else data.isLiked = false;
+          likes.push(data);
+        }
+      }
+      user.likes = likes;
+      user.requiredExp = user.level * settings.exp_to_next_level;
+      return user;
     },
     me: async (args, req) => {
       try {
