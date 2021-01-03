@@ -343,6 +343,24 @@ module.exports = db => {
       catch (error) {
         throw new Error(error.message)
       }
+    },
+    getLeaderboard: async (args, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        const users = await db.models.Users.findAll()
+        users.sort((a,b) => {
+          if(a.level > b.level) return -1;
+          if(a.level < b.level) return 1;
+          if(a.level === b.level && a.exp > b.exp) return -1;
+          if(a.level === b.level && a.exp < b.exp) return 1;
+          return 0;
+        });
+
+        return users;
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
     }
   }
 }

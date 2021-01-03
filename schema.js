@@ -32,6 +32,7 @@ const schema = buildSchema(`
       user(id: String!): User!
       me: User!
       getCategories: [Category]
+      getLeaderboard: [User]
     }
     type Mutation {
       registerUser(username: String!, password: String!, email: String!): AuthPayload!
