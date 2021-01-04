@@ -14,6 +14,7 @@ const schema = buildSchema(`
         exp: Int!
         likes: [Category]
         requiredExp: Int!
+        completedTasks: Int!
         createdAt: String!
     }
     type Category {

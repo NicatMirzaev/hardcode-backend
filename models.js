@@ -52,6 +52,11 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
+      },
+      completedTasks: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
       }
   }),
   sequelize.define('Categories', {
