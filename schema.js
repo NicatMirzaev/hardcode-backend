@@ -17,6 +17,7 @@ const schema = buildSchema(`
         completedTasks: Int!
         createdAt: String!
     }
+
     type Category {
       id: String!
       name: String!
@@ -25,16 +26,34 @@ const schema = buildSchema(`
       likes: Int!
       isLiked: Boolean!
     }
+
     type AuthPayload {
       token: String!
       user: User!
     }
+
+    type Task {
+      id: String!
+      categoryId: String!
+      name: String!
+      difficulty: String!
+      solvedCount: Int!
+      step: Int!
+    }
+
+    type TasksPayload {
+      category: Category!
+      tasks: [Task]
+    }
+
     type Query {
       user(id: String!): User!
       me: User!
       getCategories: [Category]
       getLeaderboard: [User]
+      getTasks(categoryId: String!): TasksPayload!
     }
+
     type Mutation {
       registerUser(username: String!, password: String!, email: String!): AuthPayload!
       loginUser(email: String!, password: String!): AuthPayload!

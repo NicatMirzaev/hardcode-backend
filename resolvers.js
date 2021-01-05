@@ -347,7 +347,7 @@ module.exports = db => {
     getLeaderboard: async (args, req) => {
       try {
         if(!req.user) throw new Error("Giriş yapmalısınız.")
-        const users = await db.models.Users.findAll()
+        const users = await db.models.Users.findAll({ limit: 20 })
         users.sort((a,b) => {
           if(a.level > b.level) return -1;
           if(a.level < b.level) return 1;
@@ -357,6 +357,28 @@ module.exports = db => {
         });
 
         return users;
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
+    },
+    getTasks: async ({ categoryId }, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        const category = await db.models.Categories.findByPk(categoryId);
+        if(!category) throw new Error("Geçersiz kategori girdiniz.")
+        const isLiked = await db.models.Likes.findOne({
+          where: {
+            [Op.and]: [
+              {userId: req.user.id},
+              {categoryId: category.id}
+            ]
+          }
+        })
+        if(isLiked) category.isLiked = true;
+        else category.isLiked = false;
+        const tasks = await db.models.Tasks.findAll({where: {categoryId: category.id}, order: [['step', 'ASC']]})
+        return {category: category, tasks: tasks}
       }
       catch (error) {
         throw new Error(error.message)

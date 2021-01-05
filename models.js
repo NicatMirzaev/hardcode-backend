@@ -112,6 +112,10 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    step: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     difficulty: {
       type: DataTypes.STRING(10),
       defaultValue: "Kolay",
