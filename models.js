@@ -96,6 +96,32 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false
     }
+  }),
+  sequelize.define('Tasks', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      primaryKey: true,
+      allowNull: false
+    },
+    categoryId: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    difficulty: {
+      type: DataTypes.STRING(10),
+      defaultValue: "Kolay",
+      allowNull: false
+    },
+    solvedCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    }
   })
   sequelize.define('Subscribers', {
     email: {

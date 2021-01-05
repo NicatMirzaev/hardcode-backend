@@ -288,7 +288,7 @@ module.exports = db => {
     getCategories: async (args, req) => {
       try {
         if(!req.user) throw new Error("Giriş yapmalısınız.");
-        const getCategories = await db.models.Categories.findAll({order: ['likes']});
+        const getCategories = await db.models.Categories.findAll({order: [['likes', 'DESC']]});
         const categories = getCategories.map(async category => {
           const isLiked = await db.models.Likes.findOne({
             where: {
