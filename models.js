@@ -116,6 +116,11 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    exp: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
+    },
     difficulty: {
       type: DataTypes.STRING(10),
       defaultValue: "Kolay",
@@ -124,6 +129,16 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
     solvedCount: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+      allowNull: false
+    }
+  }),
+  sequelize.define('SolvedTasks', {
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+    taskId: {
+      type: DataTypes.UUID,
       allowNull: false
     }
   })

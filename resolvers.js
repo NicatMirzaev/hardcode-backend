@@ -367,6 +367,8 @@ module.exports = db => {
         if(!req.user) throw new Error("Giriş yapmalısınız.");
         const category = await db.models.Categories.findByPk(categoryId);
         if(!category) throw new Error("Geçersiz kategori girdiniz.")
+        category.views += 1;
+        await category.save();
         const isLiked = await db.models.Likes.findOne({
           where: {
             [Op.and]: [
@@ -377,7 +379,20 @@ module.exports = db => {
         })
         if(isLiked) category.isLiked = true;
         else category.isLiked = false;
-        const tasks = await db.models.Tasks.findAll({where: {categoryId: category.id}, order: [['step', 'ASC']]})
+        const getTasks = await db.models.Tasks.findAll({where: {categoryId: category.id}, order: [['step', 'ASC']]})
+        const tasks = getTasks.map(async task => {
+          const isSolved = await db.models.SolvedTasks.findOne({
+            where: {
+              [Op.and]: [
+                {userId: req.user.id},
+                {taskId: task.id}
+              ]
+            }
+          })
+          if(isSolved) task.isSolved = true;
+          else task.isSolved = false;
+          return task;
+        })
         return {category: category, tasks: tasks}
       }
       catch (error) {

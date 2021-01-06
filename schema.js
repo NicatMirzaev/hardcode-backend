@@ -38,6 +38,7 @@ const schema = buildSchema(`
       name: String!
       difficulty: String!
       solvedCount: Int!
+      isSolved: Boolean!
       step: Int!
     }
 
