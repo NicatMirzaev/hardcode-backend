@@ -1,5 +1,5 @@
 const jsonwebtoken = require('jsonwebtoken')
-const Op = require('Sequelize').Op;
+const Sequelize = require('Sequelize');
 const settings = require('./lib/settings.js');
 const emailValidator = require('email-validator');
 const transporter = require('./lib/mail.js');
@@ -19,7 +19,7 @@ module.exports = db => {
         if(data) {
           const isLiked = await db.models.Likes.findOne({
             where: {
-              [Op.and]: [
+              [Sequelize.Op.and]: [
                 {userId: req.user.id},
                 {categoryId: getLikes[i].categoryId}
               ]
@@ -292,7 +292,7 @@ module.exports = db => {
         const categories = getCategories.map(async category => {
           const isLiked = await db.models.Likes.findOne({
             where: {
-              [Op.and]: [
+              [Sequelize.Op.and]: [
                 {userId: req.user.id},
                 {categoryId: category.id}
               ]
@@ -319,7 +319,7 @@ module.exports = db => {
         let isLiked = false;
         const like = await db.models.Likes.findOne({
           where: {
-            [Op.and]: [
+            [Sequelize.Op.and]: [
               {userId: user.id},
               {categoryId: category.id}
             ]
@@ -371,7 +371,7 @@ module.exports = db => {
         await category.save();
         const isLiked = await db.models.Likes.findOne({
           where: {
-            [Op.and]: [
+            [Sequelize.Op.and]: [
               {userId: req.user.id},
               {categoryId: category.id}
             ]
@@ -383,7 +383,7 @@ module.exports = db => {
         const tasks = getTasks.map(async task => {
           const isSolved = await db.models.SolvedTasks.findOne({
             where: {
-              [Op.and]: [
+              [Sequelize.Op.and]: [
                 {userId: req.user.id},
                 {taskId: task.id}
               ]
@@ -394,6 +394,39 @@ module.exports = db => {
           return task;
         })
         return {category: category, tasks: tasks}
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
+    },
+    getAllTasks: async (args, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        const getTasks = await db.models.Tasks.findAll();
+        const tasks = getTasks.map(async task => {
+          const isSolved = await db.models.SolvedTasks.findOne({
+            where: {
+              [Sequelize.Op.and]: [
+                {userId: req.user.id},
+                {taskId: task.id}
+              ]
+            }
+          })
+          if(isSolved) task.isSolved = true;
+          else task.isSolved = false;
+          return task;
+        })
+        return tasks;
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
+    },
+    getAllUsers: async (args, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        const users = await db.models.Users.findAll({where: {isConfirmed: 1}})
+        return users;
       }
       catch (error) {
         throw new Error(error.message)

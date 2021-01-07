@@ -53,6 +53,8 @@ const schema = buildSchema(`
       getCategories: [Category]
       getLeaderboard: [User]
       getTasks(categoryId: String!): TasksPayload!
+      getAllTasks: [Task]
+      getAllUsers: [User]
     }
 
     type Mutation {
