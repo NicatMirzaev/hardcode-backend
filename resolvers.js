@@ -431,6 +431,18 @@ module.exports = db => {
       catch (error) {
         throw new Error(error.message)
       }
+    },
+    getTask: async ({ id }, req) => {
+      try {
+        //if(!req.user) throw new Error("Giriş yapmalısınız.")
+        const task = await db.models.Tasks.findByPk(id);
+        if(!task) throw new Error("Geçersiz görev.")
+        task.data = await require(`./tasks/${id}.js`);
+        return task;
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
     }
   }
 }

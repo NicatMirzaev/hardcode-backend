@@ -26,6 +26,17 @@ const schema = buildSchema(`
       likes: Int!
       isLiked: Boolean!
     }
+    type Languages {
+      Python: String
+      NodeJS: String
+      c_plus_plus: String
+      c_sharp: String
+      Java: String
+    }
+    type TaskData {
+      languages: Languages
+      content: String!
+    }
 
     type AuthPayload {
       token: String!
@@ -40,6 +51,7 @@ const schema = buildSchema(`
       solvedCount: Int!
       isSolved: Boolean!
       step: Int!
+      data: TaskData
     }
 
     type TasksPayload {
@@ -55,6 +67,7 @@ const schema = buildSchema(`
       getTasks(categoryId: String!): TasksPayload!
       getAllTasks: [Task]
       getAllUsers: [User]
+      getTask(id: String!): Task!
     }
 
     type Mutation {
