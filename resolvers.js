@@ -391,6 +391,7 @@ module.exports = db => {
           })
           if(isSolved) task.isSolved = true;
           else task.isSolved = false;
+          task.categoryName = category.name;
           return task;
         })
         return {category: category, tasks: tasks}
@@ -414,6 +415,8 @@ module.exports = db => {
           })
           if(isSolved) task.isSolved = true;
           else task.isSolved = false;
+          const category = await db.models.Categories.findByPk(task.categoryId);
+          task.categoryName = category.name;
           return task;
         })
         return tasks;

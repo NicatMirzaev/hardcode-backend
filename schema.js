@@ -27,11 +27,11 @@ const schema = buildSchema(`
       isLiked: Boolean!
     }
     type Languages {
-      Python: String
-      NodeJS: String
-      c_plus_plus: String
-      c_sharp: String
-      Java: String
+      python: String
+      javascript: String
+      c_cpp: String
+      csharp: String
+      java: String
     }
     type TaskData {
       languages: Languages
@@ -49,6 +49,7 @@ const schema = buildSchema(`
       name: String!
       difficulty: String!
       solvedCount: Int!
+      categoryName: String
       isSolved: Boolean!
       step: Int!
       data: TaskData

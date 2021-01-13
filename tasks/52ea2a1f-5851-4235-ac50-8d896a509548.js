@@ -3,7 +3,7 @@ const javaCode = `public class myClass {
   }
 }
 `
-const c_plus_plus_code = `#include <iostream>
+const c_cpp = `#include <iostream>
 int main() {
   return 0;
 }
@@ -17,15 +17,21 @@ public class Program
     }
 }
 `
+const content = `**Hoşgeldiniz!**
+
+*İlk Python görevine hoş geldin! merak etme, ilk görevden seni zorlamayacağız :). Tüm programlama dillerinde ilk örnek olarak, 'Hello World!' yani 'Merhaba Dünya' kullanılır. \
+Bu görev de tek yapman gereken ekrana 'Hello World!' yazısını yazdırmaktır. Kodu yazdıktan sonra "Çalıştır" butonuna tıklaman yeterli, gerisini senin için halledeceğiz.*
+
+`
 module.exports = {
   "languages": {
-    "Python": "",
-    "NodeJS": "",
-    "Java": javaCode,
-    "c_plus_plus": c_plus_plus_code,
-    "c_sharp": csharpCode
+    "python": "",
+    "javascript": "",
+    "java": javaCode,
+    "c_cpp": c_cpp,
+    "csharp": csharpCode
 
   },
-  "content": "Hello World!",
+  "content": content,
 
 }
