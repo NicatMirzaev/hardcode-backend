@@ -4,6 +4,7 @@ const settings = require('./lib/settings.js');
 const emailValidator = require('email-validator');
 const transporter = require('./lib/mail.js');
 const handlebars = require('handlebars');
+const fetch = require('node-fetch');
 const fs = require('fs');
 
 module.exports = db => {
@@ -437,7 +438,7 @@ module.exports = db => {
     },
     getTask: async ({ id }, req) => {
       try {
-        //if(!req.user) throw new Error("Giriş yapmalısınız.")
+        if(!req.user) throw new Error("Giriş yapmalısınız.")
         const task = await db.models.Tasks.findByPk(id);
         if(!task) throw new Error("Geçersiz görev.")
         task.data = await require(`./tasks/${id}.js`);
@@ -446,6 +447,71 @@ module.exports = db => {
       catch (error) {
         throw new Error(error.message)
       }
+    },
+    solveTask: async ({ id, language, code }, req) => {
+      try {
+        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        let task = await db.models.Tasks.findByPk(id);
+        if(!task) throw new Error("Geçersiz görev.")
+        let user = await db.models.Users.findByPk(req.user.id);
+        if(!user) throw new Error("Geçersiz kullanıcı.")
+
+        task.data = await require(`./tasks/${id}.js`);
+        const testCases = task.data.testCases;
+        let returnObj = [];
+        let success_count = 0;
+        for(let i = 0; i < testCases.length; i++) {
+          var params = new URLSearchParams();
+          params.append('LanguageChoice', language);
+          params.append('Program', code)
+          params.append('Input', testCases[i].input);
+          params.append('CompilerArgs', "")
+          let response = await fetch("https://rextester.com/rundotnet/api", {
+            method: "POST",
+            body: params
+          })
+          response = await response.json();
+          if(testCases[i].output === response.Result) response.isSuccess = true, success_count += 1;
+          else response.isSuccess = false;
+          returnObj.push(response);
+          await wait(200);
+        }
+        if(success_count >= testCases.length) {
+          const isSolved = await db.models.SolvedTasks.findOne({
+            where: {
+              [Sequelize.Op.and]: [
+                {userId: req.user.id},
+                {taskId: task.id}
+              ]
+            }
+          })
+          if(!isSolved) {
+            db.models.SolvedTasks.create({ userId: user.id, taskId: task.id })
+            user.exp += task.exp;
+            user.completedTasks += 1;
+            task.solvedCount += 1;
+            user.requiredExp = user.level * settings.exp_to_next_level;
+            while (user.exp >= user.requiredExp) {
+              user.exp -= user.requiredExp
+              user.level += 1
+            }
+            await user.save();
+            await task.save();
+          }
+        }
+        return returnObj;
+      }
+      catch (error) {
+        throw new Error(error.message)
+      }
     }
   }
+}
+
+function wait(time) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve();
+        }, time);
+    });
 }

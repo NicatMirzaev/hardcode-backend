@@ -70,7 +70,12 @@ const schema = buildSchema(`
       getAllUsers: [User]
       getTask(id: String!): Task!
     }
-
+    type TestCase {
+      Result: String
+      Warnings: String
+      Errors: String
+      isSuccess: Boolean
+    }
     type Mutation {
       registerUser(username: String!, password: String!, email: String!): AuthPayload!
       loginUser(email: String!, password: String!): AuthPayload!
@@ -81,6 +86,7 @@ const schema = buildSchema(`
       unsubscribeEmail(email: String!): Boolean!
       updateProfile(currentPassword: String!, newPassword: String!, LinkedinURL: String!, GitHubURL: String!, TwitterURL: String!, ProfileImg: String!, username: String!): User!
       likeCategory(categoryId: String!): Category!
+      solveTask(id: String!, language: Int!, code: String!): [TestCase]
     }
 `);
 

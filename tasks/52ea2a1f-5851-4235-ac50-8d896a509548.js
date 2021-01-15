@@ -33,5 +33,6 @@ module.exports = {
 
   },
   "content": content,
+  "testCases": [{input: "", output: "Hello World!\n"}]
 
 }
