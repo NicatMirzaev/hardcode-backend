@@ -34,7 +34,7 @@ app.use(cors());
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: resolvers,
-    graphiql: true
+    graphiql: false
 }));
 
-app.listen(4000, () => console.log('GraphQL server now running on http://localhost:4000/graphql'));
+app.listen(4000, () => console.log('GraphQL server now running.'));
