@@ -65,7 +65,7 @@ module.exports = db => {
         const checkEmail = emailValidator.validate(email);
         if(!checkEmail) throw new Error("Geçersiz e-mail adresi girdiniz.");
 
-        const isAvailable = await db.models.Users.findOne({where: {[Op.or]: [{username: username}, {email: email}]}})
+        const isAvailable = await db.models.Users.findOne({where: {[Sequelize.Op.or]: [{username: username}, {email: email}]}})
         if(isAvailable){
           if(isAvailable.username === username) throw new Error("Bu kullanıcı adı kullanılmaktadır.")
           else throw new Error("Bu e-mail adresi kullanılmaktadır.");
