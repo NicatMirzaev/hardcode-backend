@@ -1,5 +1,5 @@
 const jsonwebtoken = require('jsonwebtoken')
-const Sequelize = require('Sequelize');
+const Sequelize = require('sequelize');
 const settings = require('./lib/settings.js');
 const emailValidator = require('email-validator');
 const transporter = require('./lib/mail.js');
