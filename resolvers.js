@@ -92,7 +92,7 @@ module.exports = db => {
           else{
             const template = handlebars.compile(html);
             const replacements = {
-              link: 'http://localhost:3000/confirm/' + confirmationToken
+              link: 'http://hard-code.herokuapp.com/confirm/' + confirmationToken
             }
             const htmlToSend = template(replacements);
             const mailOptions = {
@@ -131,7 +131,7 @@ module.exports = db => {
             else {
               const template = handlebars.compile(html);
               const replacements = {
-                link: 'http://localhost:3000/confirm/' + confirmationToken
+                link: 'http://hard-code.herokuapp.com/confirm/' + confirmationToken
               }
               const htmlToSend = template(replacements);
               const mailOptions = {
@@ -198,7 +198,7 @@ module.exports = db => {
           else {
             const template = handlebars.compile(html);
             const replacements = {
-              link: 'http://localhost:3000/reset-password/' + token
+              link: 'http://hard-code.herokuapp.com/reset-password/' + token
             }
             const htmlToSend = template(replacements);
             const mailOptions = {
