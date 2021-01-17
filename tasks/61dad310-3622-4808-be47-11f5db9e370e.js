@@ -1,19 +1,31 @@
-const javaCode = `public class myClass {
-  public static void main(String args[]) {
-  }
-}
-`
+const javaCode = `import java.util.*;
+import java.lang.*;
+
+class Rextester
+{
+    public static void main(String args[])
+    {
+    }
+}`
+
 const c_cpp = `#include <iostream>
-int main() {
-  return 0;
+
+int main()
+{
 }
 `
 const csharpCode = `using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
-public class Program
+namespace Rextester
 {
-    public static void Main(string[] args)
+    public class Program
     {
+        public static void Main(string[] args)
+        {
+        }
     }
 }
 `
