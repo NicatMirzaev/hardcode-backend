@@ -31,17 +31,17 @@ namespace Rextester
 `
 const content = `**Görev**
 
-*Bu sefer ki görev de amacınız kullanıcıdan bir değer (input) almak. Daha sonra aldığınız bu değeri ekrana yazdırmalısınız. Unutmayın, değer string, integer veya float bir değer olabilir.*
+*Bu sefer ki görev de amacınız kullanıcıdan input olarak bir isim almak. Daha sonra aldığınız bu ismi ekrana "İsminiz: " formatında yazdırmalısınız. .*
 
 **Örnek**
 
-*Eğer kullanıcı değer olarak "selam" yazarsa ekrana "selam" yazmalısınız.*
+*Eğer kullanıcı inputa "Serhat" yazarsa ekrana "İsminiz: Serhat" yazmalısınız.*
 `
 module.exports = {
   "languages": {
     "python": ""
   },
   "content": content,
-  "testCases": [{input: "Merhaba, nasılsın?", output: "Merhaba, nasılsın?\n"}, {input: "selam!", output: "selam!\n"}, {input: "5", output: "5\n"}]
+  "testCases": [{input: "Kerem", output: "İsminiz: Kerem\n"}, {input: "Kenan", output: "İsminiz: Kenan\n"}, {input: "Merve", output: "İsminiz: Merve\n"}]
 
 }

@@ -37,12 +37,7 @@ Bu görev de tek yapman gereken ekrana 'Hello World!' yazısını yazdırmaktır
 `
 module.exports = {
   "languages": {
-    "python": "",
-    "javascript": "",
-    "java": javaCode,
-    "c_cpp": c_cpp,
-    "csharp": csharpCode
-
+    "python": ""
   },
   "content": content,
   "testCases": [{input: "", output: "Hello World!\n"}]
