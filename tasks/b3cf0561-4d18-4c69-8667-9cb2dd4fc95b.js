@@ -42,6 +42,6 @@ module.exports = {
     "python": ""
   },
   "content": content,
-  "testCases": [{input: "10", output: "20\n12\n5.0\n8"}, {input: "51", output: "102\n53\n25.5\n49"}, {input: "25.5", output: "51.0\n27.5\n12.75\n23.5"}]
+  "testCases": [{input: "10", output: "20.0\n12.0\n5.0\n8.0\n"}, {input: "51", output: "102.0\n53.0\n25.5\n49.0\n"}, {input: "25.5", output: "51.0\n27.5\n12.75\n23.5\n"}]
 
 }
