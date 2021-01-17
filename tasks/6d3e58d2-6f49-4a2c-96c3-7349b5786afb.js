@@ -32,7 +32,9 @@ namespace Rextester
 const content = `**Görev**
 
 *Bu sefer ki görev de amacınız kullanıcıdan bir değer (input) almak. Daha sonra aldığınız bu değeri ekrana yazdırmalısınız. Unutmayın, değer string, integer veya float bir değer olabilir.*
+
 **Örnek**
+
 *Eğer kullanıcı değer olarak "selam" yazarsa ekrana "selam" yazmalısınız.*
 `
 module.exports = {

@@ -474,7 +474,7 @@ module.exports = db => {
           if(testCases[i].output === response.Result) response.isSuccess = true, success_count += 1;
           else response.isSuccess = false;
           returnObj.push(response);
-          await wait(200);
+          await wait(500);
         }
         if(success_count >= testCases.length) {
           const isSolved = await db.models.SolvedTasks.findOne({
