@@ -37,4 +37,4 @@ app.use('/graphql', graphqlHTTP({
     graphiql: false
 }));
 
-app.listen(process.env.PORT || 8080, () => console.log('GraphQL server now running.'));
+app.listen(process.env.PORT || 4000, () => console.log('GraphQL server now running.'));

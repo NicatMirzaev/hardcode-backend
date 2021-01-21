@@ -123,7 +123,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
     },
     difficulty: {
       type: DataTypes.STRING(10),
-      defaultValue: "Kolay",
+      defaultValue: "Easy",
       allowNull: false
     },
     solvedCount: {

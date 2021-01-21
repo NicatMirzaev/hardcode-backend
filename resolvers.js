@@ -10,9 +10,9 @@ const fs = require('fs');
 module.exports = db => {
   return {
     user: async ({ id }, req) => {
-      if(!req.user) throw new Error("Giriş yapmalısınız.")
+      if(!req.user) throw new Error("Unauthorized.")
       const user = await db.models.Users.findByPk(id)
-      if(!user) throw new Error("Kullanıcı bulunamadı.")
+      if(!user) throw new Error("User not found.")
       const getLikes = await db.models.Likes.findAll({where: {userId: user.id}})
       const likes = [];
       for(let i = 0; i < getLikes.length; i++) {
@@ -37,9 +37,9 @@ module.exports = db => {
     },
     me: async (args, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        if(!req.user) throw new Error("Unauthorized.")
         const user = await db.models.Users.findByPk(req.user.id)
-        if(!user) throw new Error("Kullanıcı bulunamadı.")
+        if(!user) throw new Error("User not found.")
         const getLikes = await db.models.Likes.findAll({where: {userId: user.id}})
         const likes = [];
         for(let i = 0; i < getLikes.length; i++) {
@@ -59,16 +59,16 @@ module.exports = db => {
     },
     registerUser: async ({ username, email, password }) => {
       try {
-        if(username.length < 3 || username.length > 40) throw new Error("Kullanıcı adı en az 3, en fazla 40 karakterden oluşabilir.");
-        if(password.length < 6 || password.length > 255) throw new Error("Şifre en az 6, en fazla 255 karakterden oluşabilir.");
+        if(username.length < 3 || username.length > 40) throw new Error("The username can be a minimum of 3 and a maximum of 40 characters.");
+        if(password.length < 6 || password.length > 255) throw new Error("The password can be a minimum of 6 and a maximum of 255 characters.");
 
         const checkEmail = emailValidator.validate(email);
-        if(!checkEmail) throw new Error("Geçersiz e-mail adresi girdiniz.");
+        if(!checkEmail) throw new Error("You have entered an invalid e-mail address.");
 
         const isAvailable = await db.models.Users.findOne({where: {[Sequelize.Op.or]: [{username: username}, {email: email}]}})
         if(isAvailable){
-          if(isAvailable.username === username) throw new Error("Bu kullanıcı adı kullanılmaktadır.")
-          else throw new Error("Bu e-mail adresi kullanılmaktadır.");
+          if(isAvailable.username === username) throw new Error("This username is used.")
+          else throw new Error("This email address is used.");
         }
         const user = await db.models.Users.create({
           username: username,
@@ -92,13 +92,13 @@ module.exports = db => {
           else{
             const template = handlebars.compile(html);
             const replacements = {
-              link: 'http://hard-code.herokuapp.com/confirm/' + confirmationToken
+              link: settings.signupConfirmUri + confirmationToken
             }
             const htmlToSend = template(replacements);
             const mailOptions = {
               from: 'HardCode Community',
               to: email,
-              subject: 'HardCode - Hesap Onaylama',
+              subject: 'HardCode - Account Confirmation',
               html: htmlToSend,
             }
             transporter.sendMail(mailOptions);
@@ -115,9 +115,9 @@ module.exports = db => {
     },
     loginUser: async ({ email, password }) => {
       try {
-        if(email.length < 3 || password.length < 3) throw new Error("Lütfen mail ve şifrenizi eksiksiz doldurun.");
+        if(email.length < 3 || password.length < 3) throw new Error("Please enter your email and password correct.");
         const user = await db.models.Users.findOne({where: {email: email, password: password}});
-        if(!user) throw new Error("Geçersiz email adresi veya şifre.");
+        if(!user) throw new Error("Invalid email address or password.");
         if(user.isConfirmed == false) {
           const confirmationToken = jsonwebtoken.sign(
             { id: user.id },
@@ -131,13 +131,13 @@ module.exports = db => {
             else {
               const template = handlebars.compile(html);
               const replacements = {
-                link: 'http://hard-code.herokuapp.com/confirm/' + confirmationToken
+                link: settings.signupConfirmUri + confirmationToken
               }
               const htmlToSend = template(replacements);
               const mailOptions = {
                 from: 'HardCode Community',
                 to: email,
-                subject: 'HardCode - Hesap Onaylama',
+                subject: 'HardCode - Account Confirmation',
                 html: htmlToSend,
               }
               transporter.sendMail(mailOptions);
@@ -170,10 +170,10 @@ module.exports = db => {
     },
     confirmUser: async ({ token }) => {
       try {
-        if(!token) throw new Error("Geçersiz token.");
+        if(!token) throw new Error("Invalid token.");
         const verifiedToken = jsonwebtoken.verify(token, settings.signupConfirmSecret);
         const user = await db.models.Users.findByPk(verifiedToken.id);
-        if(!user) throw new Error("Kullanıcı bulunamadı.");
+        if(!user) throw new Error("User not found.");
         user.isConfirmed = true;
         await user.save();
         return user
@@ -185,7 +185,7 @@ module.exports = db => {
     sendResetPasswordConfirmation: async ({ email }) => {
       try {
         const user = await db.models.Users.findOne({where: {email: email}});
-        if(!user) throw new Error("Geçersiz email adresi girdiniz.");
+        if(!user) throw new Error("You have entered an invalid e-mail address.");
         const token = jsonwebtoken.sign(
           { id: user.id },
           settings.resetPasswordConfirmSecret,
@@ -198,13 +198,13 @@ module.exports = db => {
           else {
             const template = handlebars.compile(html);
             const replacements = {
-              link: 'http://hard-code.herokuapp.com/reset-password/' + token
+              link: settings.resetPasswordUri + token
             }
             const htmlToSend = template(replacements);
             const mailOptions = {
               from: 'HardCode Community',
               to: email,
-              subject: 'HardCode - Şifre Değiştirme',
+              subject: 'HardCode - Change Password',
               html: htmlToSend,
             }
             transporter.sendMail(mailOptions);
@@ -218,10 +218,10 @@ module.exports = db => {
     },
     resetPassword: async ({ token, newPassword, type }) => {
       try {
-        if(newPassword.length < 6 || newPassword.length > 255) throw new Error("Şifre en az 6, en fazla 255 karakterden oluşabilir.");
+        if(newPassword.length < 6 || newPassword.length > 255) throw new Error("The password can consist of at least 6 and maximum 255 characters.");
         const verifiedToken = (!type ? jsonwebtoken.verify(token, settings.authSecret) : jsonwebtoken.verify(token, settings.resetPasswordConfirmSecret));
         const user = await db.models.Users.findByPk(verifiedToken.id);
-        if(!user) throw new Error("Kullanıcı bulunamadı.");
+        if(!user) throw new Error("User not found.");
         user.password = newPassword;
         await user.save();
         return true;
@@ -232,9 +232,9 @@ module.exports = db => {
     },
     subscribeEmail: async ({ email }) => {
       try {
-        if(!emailValidator.validate(email)) throw new Error("Geçersiz e-mail adresi girdiniz.");
+        if(!emailValidator.validate(email)) throw new Error("You have entered an invalid e-mail address.");
         const check = await db.models.Subscribers.findOne({where: {email: email}});
-        if(check) throw new Error("Bu e-mail adresi ile zaten abone olunmuş.");
+        if(check) throw new Error("This e-mail address already subscribed.");
         await db.models.Subscribers.create({email: email});
         return true;
       }
@@ -245,7 +245,7 @@ module.exports = db => {
     unsubscribeEmail: async ({ email }) => {
       try {
         const check = db.models.Subscribers.findOne({where: {email: email}})
-        if(!check) throw new Error("Geçersiz e-mail adresi.");
+        if(!check) throw new Error("Invalid e-mail address.");
         await check.destroy();
         return true;
       }
@@ -255,13 +255,13 @@ module.exports = db => {
     },
     updateProfile: async ({currentPassword, newPassword, LinkedinURL, GitHubURL, TwitterURL, ProfileImg, username}, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.");
-        if(!currentPassword.length) throw new Error("Hesabınızda değişiklik yapabilmek için şu anki şifrenizi girmelisiniz.");
-        if(username.length < 3 || username.length > 40) throw new Error("Kullanıcı adı en az 3, en fazla 40 karakterden oluşabilir.");
-        if(newPassword.length > 0  && (newPassword.length < 6 || newPassword.length > 255)) throw new Error("Yeni şifre en az 6, en fazla 255 karakterden oluşabilir.");
+        if(!req.user) throw new Error("Unauthorized.");
+        if(!currentPassword.length) throw new Error("You must enter your current password to make changes on your account.");
+        if(username.length < 3 || username.length > 40) throw new Error("Username can be at least 3 and at most 40 characters.");
+        if(newPassword.length > 0  && (newPassword.length < 6 || newPassword.length > 255)) throw new Error("New password can be at least 3 and at most 40 characters.");
         const user = await db.models.Users.findByPk(req.user.id);
-        if(!user) throw new Error("Kullanıcı bulunamadı.")
-        if(user.password !== currentPassword) throw new Error("Mevcut şifrenizi yanlış girdiniz, lütfen tekrar deneyin.");
+        if(!user) throw new Error("User not found.")
+        if(user.password !== currentPassword) throw new Error("You entered your current password incorrectly, please try again.");
         user.username = username;
         if(newPassword.length > 0) user.password = newPassword;
         user.profileImg = ProfileImg;
@@ -288,7 +288,7 @@ module.exports = db => {
     },
     getCategories: async (args, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        if(!req.user) throw new Error("Unauthorized.");
         const getCategories = await db.models.Categories.findAll({order: [['likes', 'DESC']]});
         const categories = getCategories.map(async category => {
           const isLiked = await db.models.Likes.findOne({
@@ -312,11 +312,11 @@ module.exports = db => {
     },
     likeCategory: async ({ categoryId }, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        if(!req.user) throw new Error("Unauthorized.");
         const user = await db.models.Users.findByPk(req.user.id);
-        if(!user) throw new Error("Kullanıcı bulunamadı.")
+        if(!user) throw new Error("User not found.")
         const category = await db.models.Categories.findByPk(categoryId);
-        if(!category) throw new Error("Kategori bulunamadı.")
+        if(!category) throw new Error("Category not found.")
         let isLiked = false;
         const like = await db.models.Likes.findOne({
           where: {
@@ -347,7 +347,7 @@ module.exports = db => {
     },
     getLeaderboard: async (args, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        if(!req.user) throw new Error("Unauthorized.")
         const users = await db.models.Users.findAll({ limit: 20 })
         users.sort((a,b) => {
           if(a.level > b.level) return -1;
@@ -365,9 +365,9 @@ module.exports = db => {
     },
     getTasks: async ({ categoryId }, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.");
+        if(!req.user) throw new Error("Unauthorized.");
         const category = await db.models.Categories.findByPk(categoryId);
-        if(!category) throw new Error("Geçersiz kategori girdiniz.")
+        if(!category) throw new Error("Category not found.")
         category.views += 1;
         await category.save();
         const isLiked = await db.models.Likes.findOne({
@@ -403,7 +403,7 @@ module.exports = db => {
     },
     getAllTasks: async (args, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        if(!req.user) throw new Error("Unauthorized.");
         const getTasks = await db.models.Tasks.findAll();
         const tasks = getTasks.map(async task => {
           const isSolved = await db.models.SolvedTasks.findOne({
@@ -428,7 +428,7 @@ module.exports = db => {
     },
     getAllUsers: async (args, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        if(!req.user) throw new Error("Unauthorized.");
         const users = await db.models.Users.findAll({where: {isConfirmed: 1}})
         return users;
       }
@@ -438,9 +438,9 @@ module.exports = db => {
     },
     getTask: async ({ id }, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        if(!req.user) throw new Error("Unauthorized.");
         const task = await db.models.Tasks.findByPk(id);
-        if(!task) throw new Error("Geçersiz görev.")
+        if(!task) throw new Error("Invalid task.")
         task.data = await require(`./tasks/${id}.js`);
         return task;
       }
@@ -450,11 +450,11 @@ module.exports = db => {
     },
     solveTask: async ({ id, language, code }, req) => {
       try {
-        if(!req.user) throw new Error("Giriş yapmalısınız.")
+        if(!req.user) throw new Error("Unauthorized.");
         let task = await db.models.Tasks.findByPk(id);
-        if(!task) throw new Error("Geçersiz görev.")
+        if(!task) throw new Error("Invalid task.")
         let user = await db.models.Users.findByPk(req.user.id);
-        if(!user) throw new Error("Geçersiz kullanıcı.")
+        if(!user) throw new Error("User not found.")
 
         task.data = await require(`./tasks/${id}.js`);
         const testCases = task.data.testCases;
